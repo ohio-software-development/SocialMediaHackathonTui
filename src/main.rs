@@ -67,7 +67,7 @@ fn swap_data(siv: &mut Cursive, name: &str) {
 fn go_back_to_main_dialog(siv: &mut Cursive) {
 
     let mut img = image_view::ImageView::new(30, 10);
-    img.set_image("../download.jpeg");
+    img.set_image("./download.jpeg");
     let image_viewer = Dialog::around(img);
     
     let layout = LinearLayout::vertical()
@@ -86,7 +86,7 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     siv.clear_global_callbacks(event::Key::Esc);
 
     // Show the main dialog box
-    let _main_menu = Dialog::new()
+    let _main_menu = Dialog::around(layout)
     .title("MyTui")
     .button("Browser", |s|s.quit())
     .button("Friends", open_friends)
@@ -96,9 +96,6 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
 
     // image
     
-
-
-
     siv.add_layer(_main_menu);
 }
 
