@@ -91,13 +91,44 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     .button("Browser", |s|s.quit())
     .button("Friends", open_friends)
     .button("Messages", |s|s.quit())
-    .button("Edit", |s| s.quit())
+    .button("Edit", edit_bio)
     .button("Logout", |s| s.quit());
 
     // image
     
     siv.add_layer(_main_menu);
 }
+
+
+fn edit_bio(siv: &mut Cursive){
+    let mut img = image_view::ImageView::new(30, 10);
+    img.set_image("./download.jpeg");
+    let image_viewer = Dialog::around(img);
+    
+    let layout = LinearLayout::vertical()
+    .child(TextView::new("Profile Editor:"))
+    .child(image_viewer)
+    .child(TextView::new("Bio:"))
+    .child(EditView::new().on_submit(save_bio).content("Hi, my name is Brady and I am a sophomore studying\nComputer Science at Ohio University!"));
+    // Remove the subdialog box
+    siv.pop_layer();
+
+    // clear the menu bar from the friends page
+    siv.menubar().clear();
+    siv.set_autohide_menu(true);
+    siv.clear_global_callbacks(event::Key::Esc);
+
+    // Show the main dialog box
+    let edit_layer = Dialog::around(layout).button("Back", go_back_to_main_dialog);
+    siv.add_layer(edit_layer);
+}
+
+
+fn save_bio(_: &mut Cursive, x: &str){
+    let data = x;
+    fs::write("./bios/Brady Phelps.bio", data).expect("Unable to write file");
+}
+
 
 fn open_instagram(_: &mut Cursive){
     let path = "https://www.instagram.com/";
