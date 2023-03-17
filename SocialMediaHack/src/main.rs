@@ -1,3 +1,5 @@
+// Rust TUI interface for mockup terminal social media site by @BP-2 and @jude-shreffler
+
 use cursive::views::{Dialog, TextView};
 
 fn main() {
@@ -12,3 +14,10 @@ fn main() {
     // Starts the event loop.
     siv.run();
 }
+
+
+
+
+// todo: series of functions to display different UI menus for social media interface
+// todo: image renderer?
+// todo: put together presentation and polish idea?? (idk if they using dev post or how we are supposed to submit so idk ab this yet)
