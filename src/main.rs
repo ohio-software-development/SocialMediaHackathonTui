@@ -26,48 +26,18 @@ fn main() {
     siv.add_layer(_login_menu);
     
 
+    siv.set_autohide_menu(false);
+    siv.add_global_callback(event::Key::Esc, |s| s.select_menubar());
     siv.add_global_callback('q', |s| s.quit());
     
 
     siv.run();
 }
 
-fn open_friends(siv: &mut Cursive)
-{
-    siv.pop_layer();
-
-    siv.set_autohide_menu(false);
-    siv.add_global_callback(event::Key::Esc, |s| s.select_menubar());
-
-    // create a tree of friends
-    let friends = vec!["Brady Phelps", "Alex Bikowski", "Gerald Yurek"];
-    let mut friends_tree = menu::Tree::new();
-    for friend in friends {
-        friends_tree.add_leaf(friend, |s| swap_data(s, friend));
-    }
-
-    siv.menubar()
-        .add_leaf("Home", go_back_to_main_dialog)
-        .add_subtree("Friends", friends_tree);
-
-}
-
-fn swap_data(siv: &mut Cursive, name: &str) {
-    siv.pop_layer();
-    let file_path = "bios/".to_string() + name + ".bio";
-    let bio = fs::read_to_string(file_path)
-        .expect("Should have been able to read the file");
-    siv.add_layer(
-        Dialog::around(TextView::new(bio))
-            .title("Bio")
-    );
-}
-
-
 fn go_back_to_main_dialog(siv: &mut Cursive) {
 
     let mut img = image_view::ImageView::new(30, 10);
-    img.set_image("./download.jpeg");
+    img.set_image("./images/Brady Phelps.jpeg");
     let image_viewer = Dialog::around(img);
     
     let layout = LinearLayout::vertical()
@@ -80,23 +50,57 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     // Remove the subdialog box
     siv.pop_layer();
 
-    // clear the menu bar from the friends page
+    // create the menu bar
     siv.menubar().clear();
-    siv.set_autohide_menu(true);
-    siv.clear_global_callbacks(event::Key::Esc);
+
+    // create a subtree of friends
+    let friends = vec!["Jude Shreffler", "Alex Bikowski", "Gerald Yurek"];
+    let mut friends_tree = menu::Tree::new();
+    for friend in friends {
+        friends_tree.add_leaf(friend, |s| swap_data(s, friend));
+    }
+
+    siv.menubar()
+        .add_leaf("Home", go_back_to_main_dialog)
+        .add_subtree("Browser", menu::Tree::new()
+            .leaf("Instagram", open_instagram)
+            .leaf("Linkedin", open_linkedin)
+            .leaf("Facebook", open_facebook)
+        )
+        .add_subtree("Friends", friends_tree)
+        .add_leaf("Edit", go_back_to_main_dialog)
+        .add_leaf("Logout", |s| s.quit());
 
     // Show the main dialog box
     let _main_menu = Dialog::around(layout)
-    .title("MyTui")
-    .button("Browser", |s|s.quit())
-    .button("Friends", open_friends)
-    .button("Messages", |s|s.quit())
-    .button("Edit", edit_bio)
-    .button("Logout", |s| s.quit());
+    .title("MyTui");
 
     // image
-    
     siv.add_layer(_main_menu);
+}
+
+fn swap_data(siv: &mut Cursive, name: &str) {
+    siv.pop_layer();
+    let file_path = "bios/".to_string() + name + ".bio";
+    let bio = fs::read_to_string(file_path)
+        .expect("Should have been able to read the file");
+
+    let mut img = image_view::ImageView::new(30, 10);
+    img.set_image("./download.jpeg");
+    let image_viewer = Dialog::around(img);
+
+    let layout = LinearLayout::vertical()
+    .child(TextView::new("Profile:"))
+    .child(image_viewer)
+    .child(TextView::new("Bio:"))
+    .child(TextView::new(bio));
+
+    // Show the main dialog box
+    let content = Dialog::around(layout)
+    .title("MyTui");
+
+    // image
+    siv.add_layer(content);
 }
 
 
