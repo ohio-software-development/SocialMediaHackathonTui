@@ -11,6 +11,8 @@ mod image_view;
 
 fn main() {
     let mut siv = Cursive::new();
+
+
     siv.set_theme(better_theme());
     
     // notes:
@@ -107,7 +109,7 @@ fn swap_data(siv: &mut Cursive, name: &str) {
 
 fn edit_bio(siv: &mut Cursive){
     let mut img = image_view::ImageView::new(40, 14);
-    img.set_image("./download2.jpeg");
+    img.set_image("./images/Brady Phelps.jpeg");
     let image_viewer = Dialog::around(img);
     
     let layout = LinearLayout::vertical()
