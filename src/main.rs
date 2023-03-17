@@ -104,7 +104,10 @@ fn swap_data(siv: &mut Cursive, name: &str) {
 
     // Show the main dialog box
     let content = Dialog::around(layout)
-    .title("MyTui");
+    .title("MyTui")
+    .button("Like", go_back_to_main_dialog)
+    .button("Dislike", go_back_to_main_dialog)
+    ;
 
     // image
     siv.add_layer(content);
