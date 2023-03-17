@@ -42,11 +42,15 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     img.set_image("./images/Brady Phelps.jpeg");
     let image_viewer = Dialog::around(img);
     
+    let bio = fs::read_to_string("bios/Brady Phelps.bio")
+        .expect("Should have been able to read the file");
+
+
     let layout = LinearLayout::vertical()
     .child(TextView::new("Profile:"))
     .child(image_viewer)
     .child(TextView::new("Bio:"))
-    .child(TextView::new("Hi, my name is Brady and I am a sophomore studying\nComputer Science at Ohio University!"));
+    .child(TextView::new(bio));
 
 
     // Remove the subdialog box
@@ -111,12 +115,15 @@ fn edit_bio(siv: &mut Cursive){
     let mut img = image_view::ImageView::new(40, 14);
     img.set_image("./images/Brady Phelps.jpeg");
     let image_viewer = Dialog::around(img);
+
+    let bio = fs::read_to_string("bios/Brady Phelps.bio")
+        .expect("Should have been able to read the file");
     
     let layout = LinearLayout::vertical()
     .child(TextView::new("Profile Editor:"))
     .child(image_viewer)
     .child(TextView::new("Bio:"))
-    .child(EditView::new().on_submit(save_bio).content("Hi, my name is Brady and I am a sophomore studying\nComputer Science at Ohio University!"));
+    .child(EditView::new().on_submit(save_bio).content(bio));
     // Remove the subdialog box
     siv.pop_layer();
 
