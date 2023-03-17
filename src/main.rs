@@ -36,7 +36,7 @@ fn main() {
 
 fn go_back_to_main_dialog(siv: &mut Cursive) {
 
-    let mut img = image_view::ImageView::new(30, 10);
+    let mut img = image_view::ImageView::new(40, 14);
     img.set_image("./images/Brady Phelps.jpeg");
     let image_viewer = Dialog::around(img);
     
@@ -68,7 +68,7 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
             .leaf("Facebook", open_facebook)
         )
         .add_subtree("Friends", friends_tree)
-        .add_leaf("Edit", go_back_to_main_dialog)
+        .add_leaf("Edit", edit_bio)
         .add_leaf("Logout", |s| s.quit());
 
     // Show the main dialog box
@@ -85,8 +85,9 @@ fn swap_data(siv: &mut Cursive, name: &str) {
     let bio = fs::read_to_string(file_path)
         .expect("Should have been able to read the file");
 
-    let mut img = image_view::ImageView::new(30, 10);
-    img.set_image("./download.jpeg");
+    let mut img = image_view::ImageView::new(40, 14);
+    let image_path = String::from("./images/") + name + ".jpeg";
+    img.set_image(&image_path);
     let image_viewer = Dialog::around(img);
 
     let layout = LinearLayout::vertical()
@@ -105,8 +106,8 @@ fn swap_data(siv: &mut Cursive, name: &str) {
 
 
 fn edit_bio(siv: &mut Cursive){
-    let mut img = image_view::ImageView::new(30, 10);
-    img.set_image("./download.jpeg");
+    let mut img = image_view::ImageView::new(40, 14);
+    img.set_image("./download2.jpeg");
     let image_viewer = Dialog::around(img);
     
     let layout = LinearLayout::vertical()
@@ -117,10 +118,6 @@ fn edit_bio(siv: &mut Cursive){
     // Remove the subdialog box
     siv.pop_layer();
 
-    // clear the menu bar from the friends page
-    siv.menubar().clear();
-    siv.set_autohide_menu(true);
-    siv.clear_global_callbacks(event::Key::Esc);
 
     // Show the main dialog box
     let edit_layer = Dialog::around(layout).button("Back", go_back_to_main_dialog);
