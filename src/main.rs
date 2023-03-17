@@ -1,23 +1,30 @@
 // Rust TUI interface for mockup terminal social media site by @BP-2 and @jude-shreffler
 
-use cursive::views::{Dialog, TextView,EditView};
+use cursive::views::{Dialog, LinearLayout, TextView,EditView};
 use cursive::theme::{Color, Theme, PaletteColor, BaseColor};
 use cursive::{Cursive, CursiveExt, event, menu};
+use cursive_extras::{*};
 use std::fs;
+
+mod image_view;
+
 
 fn main() {
     let mut siv = Cursive::new();
-    let mut theme = Theme::default();
-
-    theme.palette[PaletteColor::Background] = Color::Rgb(21, 71, 52);
-    theme.palette[PaletteColor::View] = Color::Dark(BaseColor::Black);
-    theme.palette[PaletteColor::Primary] = Color::Light(BaseColor::White);
-    theme.palette[PaletteColor::Shadow] = Color::Light(BaseColor::White);
+    siv.set_theme(better_theme());
     
-
-    siv.set_theme(theme);
+    // notes:
+    // .child(EditView::new().content("blahblahblah"));
     
-    go_back_to_main_dialog(&mut siv);
+    // img = image_view::ImageView::set_image(&mut img, "IMG_7223[20].png");
+    let _login_menu = Dialog::around(styled_editview("", "Login", true))
+    .button("Enter", go_back_to_main_dialog)
+    .button("Quit", |view| view.quit())
+    .title("Login");
+    // image
+    // siv.add_layer(layout);
+    siv.add_layer(_login_menu);
+    
 
     siv.add_global_callback('q', |s| s.quit());
     
@@ -56,7 +63,20 @@ fn swap_data(siv: &mut Cursive, name: &str) {
     );
 }
 
+
 fn go_back_to_main_dialog(siv: &mut Cursive) {
+
+    let mut img = image_view::ImageView::new(30, 10);
+    img.set_image("../download.jpeg");
+    let image_viewer = Dialog::around(img);
+    
+    let layout = LinearLayout::vertical()
+    .child(TextView::new("Profile:"))
+    .child(image_viewer)
+    .child(TextView::new("Bio:"))
+    .child(TextView::new("Hi, my name is Brady and I am a sophomore studying\nComputer Science at Ohio University!"));
+
+
     // Remove the subdialog box
     siv.pop_layer();
 
@@ -82,20 +102,31 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     siv.add_layer(_main_menu);
 }
 
-fn open_file(siv: &mut Cursive) {
-    
-    siv.pop_layer();
-
-    let contents = fs::read_to_string("hello.txt")
-        .expect("Should have been able to read the file");
-    
-    siv.add_layer(
-        Dialog::new()
-        .title("input.txt")
-        .content(TextView::new(contents))
-        .button("Back", go_back_to_main_dialog)
-    );
+fn open_instagram(_: &mut Cursive){
+    let path = "https://www.instagram.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
 }
+fn open_linkedin(_: &mut Cursive){
+    let path = "https://www.linkedin.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
+}
+fn open_facebook(_: &mut Cursive){
+    let path = "https://www.facebook.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
+}
+
+
+
+
 
 
 
