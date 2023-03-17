@@ -10,7 +10,7 @@ fn main() {
     let mut siv = Cursive::new();
     let mut theme = Theme::default();
 
-    theme.palette[PaletteColor::Background] = Color::Rgb(0, 104, 72);
+    theme.palette[PaletteColor::Background] = Color::Rgb(21, 71, 52);
     theme.palette[PaletteColor::View] = Color::Dark(BaseColor::Black);
     theme.palette[PaletteColor::Primary] = Color::Light(BaseColor::White);
     theme.palette[PaletteColor::Shadow] = Color::Light(BaseColor::White);
@@ -20,12 +20,17 @@ fn main() {
     
 
     let _main_menu = Dialog::new()
-        .title("Menu")
-        .content(TextView::new("Blackboard Rust TUI"))
-        .button("Login", |s| s.quit())
-        .button("Team Members", open_subdialog)
-        .button("Quit", |s| s.quit())
-        .button("Display File", open_file);
+        .title("MyTui")
+        .button("Browser", |s|s.quit())
+        .button("Friends", open_friends)
+        .button("Messages", |s|s.quit())
+        .button("Edit", |s| s.quit())
+        .button("Logout", |s| s.quit());
+
+        // image
+        
+
+
 
     siv.add_layer(_main_menu);
 
@@ -35,14 +40,14 @@ fn main() {
     siv.run();
 }
 
-fn open_subdialog(siv: &mut Cursive)
+fn open_friends(siv: &mut Cursive)
 {
     siv.pop_layer();
 
     siv.add_layer(
         Dialog::new()
             .title("Team Members")
-            .content(TextView::new("Brady Phelps\nMichael Tan\nnPreston Rembis\nAlex Bikowski"))
+            .content(TextView::new("Brady Phelps\nJude Shreffler\nJane Doe\nMichael Scott"))
             .button("Back", go_back_to_main_dialog),
     );
 }
@@ -54,12 +59,10 @@ fn go_back_to_main_dialog(siv: &mut Cursive) {
     // Show the main dialog box
     siv.add_layer(
         Dialog::new()
-            .title("Menu")
             .content(TextView::new("Blackboard Rust TUI"))
             .button("Login", |s| s.quit())
-            .button("Team Members", open_subdialog)
+            .button("Team Members", open_friends)
             .button("Quit", |s| s.quit())
-            .button("Display File", open_file)
     );
 }
 
@@ -67,11 +70,9 @@ fn open_file(siv: &mut Cursive) {
     
     siv.pop_layer();
 
-
     let contents = fs::read_to_string("hello.txt")
         .expect("Should have been able to read the file");
     
-
     siv.add_layer(
         Dialog::new()
         .title("input.txt")
