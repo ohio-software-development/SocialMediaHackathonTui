@@ -36,20 +36,24 @@ fn open_friends(siv: &mut Cursive)
     let friends = vec!["Brady Phelps", "Alex Bikowski", "Gerald Yurek"];
     let mut friends_tree = menu::Tree::new();
     for friend in friends {
-        friends_tree.add_leaf(friend, swap_data);
+        friends_tree.add_leaf(friend, |s| swap_data(s, friend));
     }
-
 
     siv.menubar()
         .add_leaf("Home", go_back_to_main_dialog)
-        .add_leaf("Next", go_back_to_main_dialog)
-        .add_leaf("Previous", go_back_to_main_dialog)
         .add_subtree("Friends", friends_tree);
 
 }
 
-fn swap_data(siv: &mut Cursive) {
-
+fn swap_data(siv: &mut Cursive, name: &str) {
+    siv.pop_layer();
+    let file_path = "bios/".to_string() + name + ".bio";
+    let bio = fs::read_to_string(file_path)
+        .expect("Should have been able to read the file");
+    siv.add_layer(
+        Dialog::around(TextView::new(bio))
+            .title("Bio")
+    );
 }
 
 fn go_back_to_main_dialog(siv: &mut Cursive) {
