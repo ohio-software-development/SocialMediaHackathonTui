@@ -2,9 +2,8 @@
 
 use cursive::views::{Dialog, TextView,EditView};
 use cursive::theme::{Color, Theme, PaletteColor, BaseColor};
-use cursive::{Cursive, CursiveExt};
+use cursive::{Cursive, CursiveExt, event, menu};
 use std::fs;
-
 
 fn main() {
     let mut siv = Cursive::new();
@@ -18,21 +17,7 @@ fn main() {
 
     siv.set_theme(theme);
     
-
-    let _main_menu = Dialog::new()
-        .title("MyTui")
-        .button("Browser", |s|s.quit())
-        .button("Friends", open_friends)
-        .button("Messages", |s|s.quit())
-        .button("Edit", |s| s.quit())
-        .button("Logout", |s| s.quit());
-
-        // image
-        
-
-
-
-    siv.add_layer(_main_menu);
+    go_back_to_main_dialog(&mut siv);
 
     siv.add_global_callback('q', |s| s.quit());
     
@@ -44,26 +29,53 @@ fn open_friends(siv: &mut Cursive)
 {
     siv.pop_layer();
 
-    siv.add_layer(
-        Dialog::new()
-            .title("Team Members")
-            .content(TextView::new("Brady Phelps\nJude Shreffler\nJane Doe\nMichael Scott"))
-            .button("Back", go_back_to_main_dialog),
-    );
+    siv.set_autohide_menu(false);
+    siv.add_global_callback(event::Key::Esc, |s| s.select_menubar());
+
+    // create a tree of friends
+    let friends = vec!["Brady Phelps", "Alex Bikowski", "Gerald Yurek"];
+    let mut friends_tree = menu::Tree::new();
+    for friend in friends {
+        friends_tree.add_leaf(friend, swap_data);
+    }
+
+
+    siv.menubar()
+        .add_leaf("Home", go_back_to_main_dialog)
+        .add_leaf("Next", go_back_to_main_dialog)
+        .add_leaf("Previous", go_back_to_main_dialog)
+        .add_subtree("Friends", friends_tree);
+
+}
+
+fn swap_data(siv: &mut Cursive) {
+
 }
 
 fn go_back_to_main_dialog(siv: &mut Cursive) {
     // Remove the subdialog box
     siv.pop_layer();
 
+    // clear the menu bar from the friends page
+    siv.menubar().clear();
+    siv.set_autohide_menu(true);
+    siv.clear_global_callbacks(event::Key::Esc);
+
     // Show the main dialog box
-    siv.add_layer(
-        Dialog::new()
-            .content(TextView::new("Blackboard Rust TUI"))
-            .button("Login", |s| s.quit())
-            .button("Team Members", open_friends)
-            .button("Quit", |s| s.quit())
-    );
+    let _main_menu = Dialog::new()
+    .title("MyTui")
+    .button("Browser", |s|s.quit())
+    .button("Friends", open_friends)
+    .button("Messages", |s|s.quit())
+    .button("Edit", |s| s.quit())
+    .button("Logout", |s| s.quit());
+
+    // image
+    
+
+
+
+    siv.add_layer(_main_menu);
 }
 
 fn open_file(siv: &mut Cursive) {
