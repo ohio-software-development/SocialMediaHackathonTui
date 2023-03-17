@@ -1,38 +1,30 @@
 // Rust TUI interface for mockup terminal social media site by @BP-2 and @jude-shreffler
 
-use cursive::views::{Dialog, TextView,EditView};
+use cursive::views::{Dialog, LinearLayout, TextView,EditView};
 use cursive::theme::{Color, Theme, PaletteColor, BaseColor};
-use cursive::{Cursive, CursiveExt};
+use cursive::{Cursive, CursiveExt, event, menu};
+use cursive_extras::{*};
 use std::fs;
+
+mod image_view;
 
 
 fn main() {
     let mut siv = Cursive::new();
-    let mut theme = Theme::default();
-
-    theme.palette[PaletteColor::Background] = Color::Rgb(21, 71, 52);
-    theme.palette[PaletteColor::View] = Color::Dark(BaseColor::Black);
-    theme.palette[PaletteColor::Primary] = Color::Light(BaseColor::White);
-    theme.palette[PaletteColor::Shadow] = Color::Light(BaseColor::White);
+    siv.set_theme(better_theme());
     
-
-    siv.set_theme(theme);
+    // notes:
+    // .child(EditView::new().content("blahblahblah"));
     
-
-    let _main_menu = Dialog::new()
-        .title("MyTui")
-        .button("Browser", |s|s.quit())
-        .button("Friends", open_friends)
-        .button("Messages", |s|s.quit())
-        .button("Edit", |s| s.quit())
-        .button("Logout", |s| s.quit());
-
-        // image
-        
-
-
-
-    siv.add_layer(_main_menu);
+    // img = image_view::ImageView::set_image(&mut img, "IMG_7223[20].png");
+    let _login_menu = Dialog::around(styled_editview("", "Login", true))
+    .button("Enter", go_back_to_main_dialog)
+    .button("Quit", |view| view.quit())
+    .title("Login");
+    // image
+    // siv.add_layer(layout);
+    siv.add_layer(_login_menu);
+    
 
     siv.add_global_callback('q', |s| s.quit());
     
@@ -44,42 +36,87 @@ fn open_friends(siv: &mut Cursive)
 {
     siv.pop_layer();
 
+    siv.set_autohide_menu(false);
+    siv.add_global_callback(event::Key::Esc, |s| s.select_menubar());
+
+    // create a tree of friends
+    let friends = vec!["Brady Phelps", "Alex Bikowski", "Gerald Yurek"];
+    let mut friends_tree = menu::Tree::new();
+    for friend in friends {
+        friends_tree.add_leaf(friend, |s| swap_data(s, friend));
+    }
+
+    siv.menubar()
+        .add_leaf("Home", go_back_to_main_dialog)
+        .add_subtree("Friends", friends_tree);
+
+}
+
+fn swap_data(siv: &mut Cursive, name: &str) {
+    siv.pop_layer();
+    let file_path = "bios/".to_string() + name + ".bio";
+    let bio = fs::read_to_string(file_path)
+        .expect("Should have been able to read the file");
     siv.add_layer(
-        Dialog::new()
-            .title("Team Members")
-            .content(TextView::new("Brady Phelps\nJude Shreffler\nJane Doe\nMichael Scott"))
-            .button("Back", go_back_to_main_dialog),
+        Dialog::around(TextView::new(bio))
+            .title("Bio")
     );
 }
 
+
 fn go_back_to_main_dialog(siv: &mut Cursive) {
+
+    let mut img = image_view::ImageView::new(30, 10);
+    img.set_image("../download.jpeg");
+    let image_viewer = Dialog::around(img);
+    
+    let layout = LinearLayout::vertical()
+    .child(TextView::new("Profile:"))
+    .child(image_viewer)
+    .child(TextView::new("Bio:"))
+    .child(TextView::new("Hi, my name is Brady and I am a sophomore studying\nComputer Science at Ohio University!"));
+
+
     // Remove the subdialog box
     siv.pop_layer();
 
     // Show the main dialog box
     siv.add_layer(
-        Dialog::new()
-            .content(TextView::new("Blackboard Rust TUI"))
-            .button("Login", |s| s.quit())
-            .button("Team Members", open_friends)
-            .button("Quit", |s| s.quit())
+        Dialog::around(layout)
+        .title("MyTui")
+        .button("Browser", open_facebook)
+        .button("Friends", open_friends)
+        .button("Messages", |s|s.quit())
+        .button("Edit", |s| s.quit())
+        .button("Logout", |s| s.quit())
     );
 }
 
-fn open_file(siv: &mut Cursive) {
-    
-    siv.pop_layer();
-
-    let contents = fs::read_to_string("hello.txt")
-        .expect("Should have been able to read the file");
-    
-    siv.add_layer(
-        Dialog::new()
-        .title("input.txt")
-        .content(TextView::new(contents))
-        .button("Back", go_back_to_main_dialog)
-    );
+fn open_instagram(_: &mut Cursive){
+    let path = "https://www.instagram.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
 }
+fn open_linkedin(_: &mut Cursive){
+    let path = "https://www.linkedin.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
+}
+fn open_facebook(_: &mut Cursive){
+    let path = "https://www.facebook.com/";
+    match open::that(path) {
+        Ok(()) => (),
+        Err(err) => eprintln!("An error occurred when opening '{}': {}", path, err),
+    }
+}
+
+
+
+
 
 
 
